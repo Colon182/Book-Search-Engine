@@ -71,9 +71,16 @@ const resolvers = {
             console.log(`context: ${context}`);
             if (context.user) {
                 // ToODO:
+                const book = await Book.findOneAndDelete({
+                    _id: bookId
+                });
 
-
+                await User.findOneAndUpdate(
+                    { _id: context.user._id},
+                    {$pull: { book: book.bookId } }
+                );
                 // return /* TODO: data to return */;
+                return book;
             }
 
             throw new AuthenticationError('You need to be logged in!');
