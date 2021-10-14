@@ -66,7 +66,7 @@ const resolvers = {
 
         },
 
-        removeBook: async function (parent, args, context) {
+        removeBook: async function (parent, { bookId }, context) {
             console.log("args: ", args);
             console.log(`context: ${context}`);
             if (context.user) {
