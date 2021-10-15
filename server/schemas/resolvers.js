@@ -18,18 +18,15 @@ const resolvers = {
     },
 
     Mutation: {
-        addUser: async function (parent, { email, password}) {
-            console.log("addUser: args: ", {email, password});
-            const user = await User.findOne({ email});
-            if (!user) {
-                throw new AuthenticationError('No user with that email address')
-            }
-            const correctPw = await user.isCorrectPassword(password);
-            if (!correctPw) {
-                throw new AuthenticationError('Password is Incorrect');
-            }
-            const token = signToken(user);;
-            return { token, user}
+        addUser: async function (parent, args) {
+            console.log("addUser: args: ", args);
+            // TODO:
+            const user = await User.create(args);
+            const token = signToken(user);
+
+            return { token, user };
+
+            // return /* TODO: data to return */
         },
 
         login: async function (parent, { email, password }) {
@@ -51,15 +48,17 @@ const resolvers = {
 
         saveBook: async function (parent, { bookData }, context) {
             // console.log("args",  args);
+            console.log("saveBook - bookData: ", bookData);
             if (context.user) {
                 // TODO:
-                const book = await Book.create({bookData})
-                await User.findOneAndUpdate(
-                    { _id: context.user._id},
-                    {$addToSet: {book: book.bookId} }
-                );
+                const updatedUser = await User.findByIdAndUpdate(
+                    { _id: context.user._id },
+                    { $push: { savedBooks: bookData } },
+                    { new: true }
+                  );
+
+                  return updatedUser;
                 // return /* TODO: data to return */;
-                return book;
             }
 
             throw new AuthenticationError('You need to be logged in!');
@@ -67,20 +66,19 @@ const resolvers = {
         },
 
         removeBook: async function (parent, { bookId }, context) {
-            console.log("args: ", args);
-            console.log(`context: ${context}`);
+            console.log("removeBook: bookId: ", bookId);
+            console.log(`removeBook: context.user._id: ${context.user?._id}`);
             if (context.user) {
                 // ToODO:
-                const book = await Book.findOneAndDelete({
-                    _id: bookId
-                });
+                const updatedUser = await User.findOneAndUpdate(
+                    { _id: context.user._id },
+                    { $pull: { savedBooks: { bookId } } },
+                    { new: true }
+                  );
 
-                await User.findOneAndUpdate(
-                    { _id: context.user._id},
-                    {$pull: { book: book.bookId } }
-                );
+                  return updatedUser;
+
                 // return /* TODO: data to return */;
-                return book;
             }
 
             throw new AuthenticationError('You need to be logged in!');
