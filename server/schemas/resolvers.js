@@ -20,17 +20,13 @@ const resolvers = {
     Mutation: {
         addUser: async function (parent, args) {
             console.log("addUser: args: ", args);
-            // TODO:
             const user = await User.create(args);
             const token = signToken(user);
 
             return { token, user };
-
-            // return /* TODO: data to return */
         },
 
         login: async function (parent, { email, password }) {
-            // console.log("args: ", args);
             console.log("login: email: ", email, " password: ", password);
             const user = await User.findOne({ email });
             if (!user) {
@@ -47,18 +43,15 @@ const resolvers = {
         },
 
         saveBook: async function (parent, { bookData }, context) {
-            // console.log("args",  args);
             console.log("saveBook - bookData: ", bookData);
             if (context.user) {
-                // TODO:
                 const updatedUser = await User.findByIdAndUpdate(
                     { _id: context.user._id },
                     { $push: { savedBooks: bookData } },
                     { new: true }
-                  );
+                );
 
-                  return updatedUser;
-                // return /* TODO: data to return */;
+                return updatedUser;
             }
 
             throw new AuthenticationError('You need to be logged in!');
@@ -69,16 +62,13 @@ const resolvers = {
             console.log("removeBook: bookId: ", bookId);
             console.log(`removeBook: context.user._id: ${context.user?._id}`);
             if (context.user) {
-                // ToODO:
                 const updatedUser = await User.findOneAndUpdate(
                     { _id: context.user._id },
                     { $pull: { savedBooks: { bookId } } },
                     { new: true }
-                  );
+                );
 
-                  return updatedUser;
-
-                // return /* TODO: data to return */;
+                return updatedUser;
             }
 
             throw new AuthenticationError('You need to be logged in!');

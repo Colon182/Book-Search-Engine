@@ -7,11 +7,8 @@ const {
   login,
 } = require('../../controllers/user-controller');
 
-// import middleware
 const { authMiddleware } = require('../../utils/auth');
 
-// put authMiddleware anywhere we need to send a token for verification of user
-// url endpint: /api/users
 router.route('/')
   .post(createUser)
   .put(authMiddleware, saveBook);
@@ -19,7 +16,6 @@ router.route('/')
 router.route('/login')
   .post(login);
 
-  // url endpoint: /api/users/me
 router.route('/me')
   .get(authMiddleware, getSingleUser);
 
